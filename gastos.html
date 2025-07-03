@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Divisão de Despesas por Mês</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #121212;
+      color: #f0f0f0;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h2 {
+      margin-top: 30px;
+      color: #90caf9;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .tab {
+      background-color: #1e1e1e;
+      color: #f0f0f0;
+      padding: 10px 15px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .tab.active {
+      background-color: #2196f3;
+      color: white;
+    }
+
+    .section {
+      background-color: #1e1e1e;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.4);
+    }
+
+    .item {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+      align-items: center;
+      padding: 10px;
+      border-radius: 6px;
+    }
+
+    .item.pago {
+      background-color: #1b5e20;
+    }
+
+    .item.nao-pago {
+      background-color: #b71c1c;
+    }
+
+    input[type="text"], input[type="number"] {
+      padding: 6px;
+      border-radius: 6px;
+      border: none;
+      background-color: #2a2a2a;
+      color: #f0f0f0;
+      flex: 1;
+    }
+
+    .flags label {
+      margin-left: 5px;
+      font-size: 0.9em;
+    }
+
+    button {
+      background-color: #2196f3;
+      border: none;
+      padding: 8px 14px;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #1976d2;
+    }
+
+    .totals {
+      font-weight: bold;
+      margin-top: 20px;
+      font-size: 1em;
+    }
+
+    .totals table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: #1e1e1e;
+    }
+
+    .totals th, .totals td {
+      border: 1px solid #444;
+      padding: 8px;
+      text-align: center;
+    }
+
+    .save-message {
+      display: none;
+      background-color: #43a047;
+      color: #fff;
+      padding: 10px;
+      text-align: center;
+      margin-bottom: 20px;
+      border-radius: 6px;
+    }
+
+    .extra-input {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .remove-btn {
+      background-color: #e53935;
+      margin-left: 10px;
+    }
+
+    .remove-btn:hover {
+      background-color: #c62828;
+    }
+  </style>
+</head>
+<body>
+  <div class="tabs" id="monthTabs"></div>
+
+  <div id="saveMessage" class="save-message">Dados salvos com sucesso!</div>
+
+  <div class="section" id="aluguelSection">
+    <h2>Despesas Fixas</h2>
+    <div id="aluguelList"></div>
+    <button onclick="addItem('aluguelList')">Adicionar Despesa</button>
+  </div>
+
+  <div class="section" id="cartaoSection">
+    <h2>Cartão de Crédito</h2>
+    <div id="cartaoList"></div>
+    <button onclick="addItem('cartaoList')">Adicionar Despesa</button>
+  </div>
+
+  <div class="section" id="extrasSection">
+    <h2>Despesas Extras</h2>
+    <div id="extrasList"></div>
+    <button onclick="addItem('extrasList')">Adicionar Despesa</button>
+  </div>
+
+  <div class="section">
+    <h2>Ajuste Manual</h2>
+    <div class="extra-input">
+      <label>Adicionar valor a Huelerson:</label>
+      <input type="number" id="extraH" value="0" onchange="calculateTotals()" />
+    </div>
+    <br /><br />
+    <div class="extra-input">
+      <label>Adicionar valor a Laura:</label>
+      <input type="number" id="extraL" value="0" onchange="calculateTotals()" />
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Totais</h2>
+    <div class="totals" id="totalsTable"></div>
+    <br />
+    <button onclick="saveData()">Salvar</button>
+    <button onclick="exportarCSV()">Exportar CSV</button>
+  </div>
+
+  <script>
+    const months = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+                    "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+    let currentMonth = new Date().getMonth(); // Mês atual (0-11)
+
+    function createTabs() {
+      const tabsContainer = document.getElementById('monthTabs');
+      months.forEach((month, index) => {
+        const tab = document.createElement('div');
+        tab.className = 'tab' + (index === currentMonth ? ' active' : '');
+        tab.textContent = month;
+        tab.onclick = () => switchMonth(index);
+        tabsContainer.appendChild(tab);
+      });
+    }
+
+    function switchMonth(monthIndex) {
+      currentMonth = monthIndex;
+      document.querySelectorAll('.tab').forEach((t, i) => {
+        t.classList.toggle('active', i === monthIndex);
+      });
+      loadData();
+    }
+
+    function getStorageKey() {
+      return `despesas_${currentMonth}`;
+    }
+
+    // Restante do código igual ao seu (createItem, updateItemStyle, addItem, calculateTotals, saveData, exportarCSV)
+
+    function createItem(name = '', value = '', flagH = true, flagL = true, pago = false) {
+      const div = document.createElement('div');
+      div.className = 'item';
+      const pagoCheckbox = document.createElement('input');
+      pagoCheckbox.type = 'checkbox';
+      pagoCheckbox.checked = pago;
+      pagoCheckbox.onchange = () => updateItemStyle(div, pagoCheckbox);
+      const pagoLabel = document.createElement('span');
+      pagoLabel.textContent = pagoCheckbox.checked ? '✅' : '❌';
+      pagoCheckbox.addEventListener('change', () => {
+        pagoLabel.textContent = pagoCheckbox.checked ? '✅' : '❌';
+        calculateTotals();
+      });
+      const nameInput = document.createElement('input');
+      nameInput.placeholder = 'Nome';
+      nameInput.value = name;
+      const valueInput = document.createElement('input');
+      valueInput.type = 'number';
+      valueInput.placeholder = 'Valor';
+      valueInput.value = value;
+      const flagHCheckbox = document.createElement('input');
+      flagHCheckbox.type = 'checkbox';
+      flagHCheckbox.checked = flagH;
+      flagHCheckbox.onchange = calculateTotals;
+      const flagLCheckbox = document.createElement('input');
+      flagLCheckbox.type = 'checkbox';
+      flagLCheckbox.checked = flagL;
+      flagLCheckbox.onchange = calculateTotals;
+      const removeBtn = document.createElement('button');
+      removeBtn.textContent = 'Excluir';
+      removeBtn.className = 'remove-btn';
+      removeBtn.onclick = () => {
+        div.remove();
+        calculateTotals();
+      };
+      nameInput.oninput = calculateTotals;
+      valueInput.oninput = calculateTotals;
+      updateItemStyle(div, pagoCheckbox);
+      div.append(pagoCheckbox, pagoLabel, nameInput, valueInput);
+      const flags = document.createElement('div');
+      flags.className = 'flags';
+      flags.append('H:', flagHCheckbox, ' L:', flagLCheckbox);
+      div.appendChild(flags);
+      div.appendChild(removeBtn);
+      return div;
+    }
+
+    function updateItemStyle(div, checkbox) {
+      div.classList.remove('pago', 'nao-pago');
+      div.classList.add(checkbox.checked ? 'pago' : 'nao-pago');
+    }
+
+    function addItem(listId) {
+      const list = document.getElementById(listId);
+      list.appendChild(createItem());
+    }
+
+    function calculateTotals() {
+      let totalH = 0, totalL = 0;
+      let linhas = [];
+      ['aluguelList', 'cartaoList', 'extrasList'].forEach(listId => {
+        document.querySelectorAll(`#${listId} .item`).forEach(item => {
+          const inputs = item.querySelectorAll('input');
+          const nome = inputs[1].value;
+          const valor = parseFloat(inputs[2].value) || 0;
+          const h = inputs[3].checked;
+          const l = inputs[4].checked;
+          const pago = inputs[0].checked ? 'Sim' : 'Não';
+          let vH = 0, vL = 0;
+          if (h && l) {
+            vH = valor / 2;
+            vL = valor / 2;
+          } else if (h) vH = valor;
+          else if (l) vL = valor;
+          totalH += vH;
+          totalL += vL;
+          linhas.push(`<tr><td>${nome}</td><td>${pago}</td><td>${vH.toFixed(2)}</td><td>${vL.toFixed(2)}</td></tr>`);
+        });
+      });
+      totalH += parseFloat(document.getElementById('extraH').value) || 0;
+      totalL += parseFloat(document.getElementById('extraL').value) || 0;
+      const extraRow = `<tr><td>Ajuste Manual</td><td>Sim</td><td>${parseFloat(document.getElementById('extraH').value).toFixed(2)}</td><td>${parseFloat(document.getElementById('extraL').value).toFixed(2)}</td></tr>`;
+      linhas.push(extraRow);
+      const totalRow = `<tr><th colspan=2>Total</th><th>${totalH.toFixed(2)}</th><th>${totalL.toFixed(2)}</th></tr>`;
+      document.getElementById('totalsTable').innerHTML = `<table><tr><th>Despesa</th><th>Pago</th><th>Huelerson</th><th>Laura</th></tr>${linhas.join('')}${totalRow}</table>`;
+    }
+
+    function saveData() {
+      const data = {
+        extraH: document.getElementById('extraH').value,
+        extraL: document.getElementById('extraL').value,
+        sections: ['aluguelList', 'cartaoList', 'extrasList'].map(listId => {
+          return Array.from(document.querySelectorAll(`#${listId} .item`)).map(item => {
+            const inputs = item.querySelectorAll('input');
+            return {
+              pago: inputs[0].checked,
+              name: inputs[1].value,
+              value: inputs[2].value,
+              h: inputs[3].checked,
+              l: inputs[4].checked
+            };
+          });
+        })
+      };
+      localStorage.setItem(getStorageKey(), JSON.stringify(data));
+      showSaveMessage();
+    }
+
+    function loadData() {
+      const saved = JSON.parse(localStorage.getItem(getStorageKey()));
+      document.getElementById('extraH').value = saved?.extraH || 0;
+      document.getElementById('extraL').value = saved?.extraL || 0;
+      ['aluguelList', 'cartaoList', 'extrasList'].forEach((listId, index) => {
+        const list = document.getElementById(listId);
+        list.innerHTML = '';
+        saved?.sections[index]?.forEach(item => {
+          list.appendChild(createItem(item.name, item.value, item.h, item.l, item.pago));
+        });
+      });
+      calculateTotals();
+    }
+
+    function exportarCSV() {
+      let csv = "Nome,Valor,H,L,Pago\n";
+      ['aluguelList', 'cartaoList', 'extrasList'].forEach(listId => {
+        document.querySelectorAll(`#${listId} .item`).forEach(item => {
+          const inputs = item.querySelectorAll('input');
+          const name = inputs[1].value;
+          const value = inputs[2].value;
+          const h = inputs[3].checked ? 'Sim' : 'Não';
+          const l = inputs[4].checked ? 'Sim' : 'Não';
+          const pago = inputs[0].checked ? 'Sim' : 'Não';
+          csv += `${name},${value},${h},${l},${pago}\n`;
+        });
+      });
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `despesas_${months[currentMonth]}.csv`;
+      a.click();
+    }
+
+    function showSaveMessage() {
+      const msg = document.getElementById('saveMessage');
+      msg.style.display = 'block';
+      setTimeout(() => {
+        msg.style.display = 'none';
+      }, 3000);
+    }
+
+    createTabs();
+    loadData();
+  </script>
+</body>
+</html>
