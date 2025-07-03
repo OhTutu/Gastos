@@ -272,15 +272,15 @@
           const inputs = item.querySelectorAll('input');
           const nome = inputs[1].value;
           const valor = parseFloat(inputs[2].value) || 0;
-          const h = inputs[3].checked;
-          const l = inputs[4].checked;
+          const a = inputs[3].checked;
+          const r = inputs[4].checked;
           const pago = inputs[0].checked ? 'Sim' : 'Não';
           let vA = 0, vR = 0;
-          if (h && l) {
+          if (a && r) {
             vA = valor / 2;
             vR = valor / 2;
-          } else if (h) vA = valor;
-          else if (l) vR = valor;
+          } else if (a) vA = valor;
+          else if (r) vR = valor;
           totalA += vA;
           totalR += vR;
           linhas.push(`<tr><td>${nome}</td><td>${pago}</td><td>${vA.toFixed(2)}</td><td>${vR.toFixed(2)}</td></tr>`);
@@ -305,8 +305,8 @@
               pago: inputs[0].checked,
               name: inputs[1].value,
               value: inputs[2].value,
-              h: inputs[3].checked,
-              l: inputs[4].checked
+              a: inputs[3].checked,
+              r: inputs[4].checked
             };
           });
         })
@@ -323,7 +323,7 @@
         const list = document.getElementById(listId);
         list.innerHTML = '';
         saved?.sections[index]?.forEach(item => {
-          list.appendChild(createItem(item.name, item.value, item.h, item.l, item.pago));
+          list.appendChild(createItem(item.name, item.value, item.a, item.r, item.pago));
         });
       });
       calculateTotals();
@@ -339,7 +339,7 @@
           const a = inputs[3].checked ? 'Sim' : 'Não';
           const r = inputs[4].checked ? 'Sim' : 'Não';
           const pago = inputs[0].checked ? 'Sim' : 'Não';
-          csv += `${name},${value},${h},${l},${pago}\n`;
+          csv += `${name},${value},${a},${r},${pago}\n`;
         });
       });
       const blob = new Blob([csv], { type: 'text/csv' });
