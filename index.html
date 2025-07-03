@@ -248,7 +248,7 @@
       div.append(pagoCheckbox, pagoLabel, nameInput, valueInput);
       const flags = document.createElement('div');
       flags.className = 'flags';
-      flags.append('H:', flagACheckbox, ' L:', flagRCheckbox);
+      flags.append('A:', flagACheckbox, ' R:', flagRCheckbox);
       div.appendChild(flags);
       div.appendChild(removeBtn);
       return div;
@@ -265,7 +265,7 @@
     }
 
     function calculateTotals() {
-      let totalH = 0, totalL = 0;
+      let totalA = 0, totalR = 0;
       let linhas = [];
       ['aluguelList', 'cartaoList', 'extrasList'].forEach(listId => {
         document.querySelectorAll(`#${listId} .item`).forEach(item => {
@@ -275,23 +275,23 @@
           const h = inputs[3].checked;
           const l = inputs[4].checked;
           const pago = inputs[0].checked ? 'Sim' : 'Não';
-          let vH = 0, vL = 0;
+          let vA = 0, vR = 0;
           if (h && l) {
-            vH = valor / 2;
-            vL = valor / 2;
-          } else if (h) vH = valor;
-          else if (l) vL = valor;
-          totalH += vH;
-          totalL += vL;
-          linhas.push(`<tr><td>${nome}</td><td>${pago}</td><td>${vH.toFixed(2)}</td><td>${vL.toFixed(2)}</td></tr>`);
+            vA = valor / 2;
+            vR = valor / 2;
+          } else if (h) vA = valor;
+          else if (l) vR = valor;
+          totalA += vA;
+          totalR += vR;
+          linhas.push(`<tr><td>${nome}</td><td>${pago}</td><td>${vA.toFixed(2)}</td><td>${vR.toFixed(2)}</td></tr>`);
         });
       });
-      totalH += parseFloat(document.getElementById('extraA').value) || 0;
-      totalL += parseFloat(document.getElementById('extraR').value) || 0;
+      totalA += parseFloat(document.getElementById('extraA').value) || 0;
+      totalR += parseFloat(document.getElementById('extraR').value) || 0;
       const extraRow = `<tr><td>Ajuste Manual</td><td>Sim</td><td>${parseFloat(document.getElementById('extraA').value).toFixed(2)}</td><td>${parseFloat(document.getElementById('extraR').value).toFixed(2)}</td></tr>`;
       linhas.push(extraRow);
-      const totalRow = `<tr><th colspan=2>Total</th><th>${totalH.toFixed(2)}</th><th>${totalL.toFixed(2)}</th></tr>`;
-      document.getElementById('totalsTable').innerHTML = `<table><tr><th>Despesa</th><th>Pago</th><th>Huelerson</th><th>Laura</th></tr>${linhas.join('')}${totalRow}</table>`;
+      const totalRow = `<tr><th colspan=2>Total</th><th>${totalA.toFixed(2)}</th><th>${totalR.toFixed(2)}</th></tr>`;
+      document.getElementById('totalsTable').innerHTML = `<table><tr><th>Despesa</th><th>Pago</th><th>Arthur</th><th>Rayssa</th></tr>${linhas.join('')}${totalRow}</table>`;
     }
 
     function saveData() {
@@ -330,14 +330,14 @@
     }
 
     function exportarCSV() {
-      let csv = "Nome,Valor,H,L,Pago\n";
+      let csv = "Nome,Valor,A,R,Pago\n";
       ['aluguelList', 'cartaoList', 'extrasList'].forEach(listId => {
         document.querySelectorAll(`#${listId} .item`).forEach(item => {
           const inputs = item.querySelectorAll('input');
           const name = inputs[1].value;
           const value = inputs[2].value;
-          const h = inputs[3].checked ? 'Sim' : 'Não';
-          const l = inputs[4].checked ? 'Sim' : 'Não';
+          const a = inputs[3].checked ? 'Sim' : 'Não';
+          const r = inputs[4].checked ? 'Sim' : 'Não';
           const pago = inputs[0].checked ? 'Sim' : 'Não';
           csv += `${name},${value},${h},${l},${pago}\n`;
         });
