@@ -160,12 +160,12 @@
     <h2>Ajuste Manual</h2>
     <div class="extra-input">
       <label>Adicionar valor a Arthur:</label>
-      <input type="number" id="extraH" value="0" onchange="calculateTotals()" />
+      <input type="number" id="extraA" value="0" onchange="calculateTotals()" />
     </div>
     <br /><br />
     <div class="extra-input">
       <label>Adicionar valor a Rayssa:</label>
-      <input type="number" id="extraL" value="0" onchange="calculateTotals()" />
+      <input type="number" id="extraR" value="0" onchange="calculateTotals()" />
     </div>
   </div>
 
@@ -286,9 +286,9 @@
           linhas.push(`<tr><td>${nome}</td><td>${pago}</td><td>${vH.toFixed(2)}</td><td>${vL.toFixed(2)}</td></tr>`);
         });
       });
-      totalH += parseFloat(document.getElementById('extraH').value) || 0;
-      totalL += parseFloat(document.getElementById('extraL').value) || 0;
-      const extraRow = `<tr><td>Ajuste Manual</td><td>Sim</td><td>${parseFloat(document.getElementById('extraH').value).toFixed(2)}</td><td>${parseFloat(document.getElementById('extraL').value).toFixed(2)}</td></tr>`;
+      totalH += parseFloat(document.getElementById('extraA').value) || 0;
+      totalL += parseFloat(document.getElementById('extraR').value) || 0;
+      const extraRow = `<tr><td>Ajuste Manual</td><td>Sim</td><td>${parseFloat(document.getElementById('extraA').value).toFixed(2)}</td><td>${parseFloat(document.getElementById('extraR').value).toFixed(2)}</td></tr>`;
       linhas.push(extraRow);
       const totalRow = `<tr><th colspan=2>Total</th><th>${totalH.toFixed(2)}</th><th>${totalL.toFixed(2)}</th></tr>`;
       document.getElementById('totalsTable').innerHTML = `<table><tr><th>Despesa</th><th>Pago</th><th>Huelerson</th><th>Laura</th></tr>${linhas.join('')}${totalRow}</table>`;
@@ -296,8 +296,8 @@
 
     function saveData() {
       const data = {
-        extraH: document.getElementById('extraH').value,
-        extraL: document.getElementById('extraL').value,
+        extraA: document.getElementById('extraA').value,
+        extraR: document.getElementById('extraR').value,
         sections: ['aluguelList', 'cartaoList', 'extrasList'].map(listId => {
           return Array.from(document.querySelectorAll(`#${listId} .item`)).map(item => {
             const inputs = item.querySelectorAll('input');
@@ -317,8 +317,8 @@
 
     function loadData() {
       const saved = JSON.parse(localStorage.getItem(getStorageKey()));
-      document.getElementById('extraH').value = saved?.extraH || 0;
-      document.getElementById('extraL').value = saved?.extraL || 0;
+      document.getElementById('extraA').value = saved?.extraA || 0;
+      document.getElementById('extraR').value = saved?.extraR || 0;
       ['aluguelList', 'cartaoList', 'extrasList'].forEach((listId, index) => {
         const list = document.getElementById(listId);
         list.innerHTML = '';
