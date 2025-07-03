@@ -207,7 +207,7 @@
 
     // Restante do código igual ao seu (createItem, updateItemStyle, addItem, calculateTotals, saveData, exportarCSV)
 
-    function createItem(name = '', value = '', flagH = true, flagL = true, pago = false) {
+    function createItem(name = '', value = '', flagA = true, flagR = true, pago = false) {
       const div = document.createElement('div');
       div.className = 'item';
       const pagoCheckbox = document.createElement('input');
@@ -227,14 +227,14 @@
       valueInput.type = 'number';
       valueInput.placeholder = 'Valor';
       valueInput.value = value;
-      const flagHCheckbox = document.createElement('input');
-      flagHCheckbox.type = 'checkbox';
-      flagHCheckbox.checked = flagH;
-      flagHCheckbox.onchange = calculateTotals;
-      const flagLCheckbox = document.createElement('input');
-      flagLCheckbox.type = 'checkbox';
-      flagLCheckbox.checked = flagL;
-      flagLCheckbox.onchange = calculateTotals;
+      const flagACheckbox = document.createElement('input');
+      flagACheckbox.type = 'checkbox';
+      flagACheckbox.checked = flagA;
+      flagACheckbox.onchange = calculateTotals;
+      const flagRCheckbox = document.createElement('input');
+      flagRCheckbox.type = 'checkbox';
+      flagRCheckbox.checked = flagR;
+      flagRCheckbox.onchange = calculateTotals;
       const removeBtn = document.createElement('button');
       removeBtn.textContent = 'Excluir';
       removeBtn.className = 'remove-btn';
@@ -248,7 +248,7 @@
       div.append(pagoCheckbox, pagoLabel, nameInput, valueInput);
       const flags = document.createElement('div');
       flags.className = 'flags';
-      flags.append('H:', flagHCheckbox, ' L:', flagLCheckbox);
+      flags.append('H:', flagACheckbox, ' L:', flagRCheckbox);
       div.appendChild(flags);
       div.appendChild(removeBtn);
       return div;
